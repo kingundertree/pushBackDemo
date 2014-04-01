@@ -27,14 +27,14 @@
     if (self) {
         // Custom initialization
         
-        capImageArr = [[NSMutableArray alloc] initWithCapacity:10];
+        capImageArr = [[NSMutableArray alloc] initWithCapacity:1000];
     }
     return self;
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     // Do any additional setup after loading the view.
     self.view.layer.shadowColor = [[UIColor blackColor]CGColor];
     self.view.layer.shadowOffset = CGSizeMake(5, 5);

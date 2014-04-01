@@ -38,9 +38,10 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = @"MVC";
-    self.view.backgroundColor = [UIColor whiteColor];
-
+    self.title = [NSString stringWithFormat:@"%d",indexNum];
+    self.view.backgroundColor = [UIColor colorWithRed:(arc4random() % 255 + 1)/255.0 green:(arc4random() % 255 + 1)/255.0 blue:(arc4random() % 255 + 1)/255.0 alpha:1.0];
+    self.navigationController.navigationBar.translucent = YES;
+    
     if ([self isIOS7]) {
         self.navigationController.interactivePopGestureRecognizer.enabled = NO;
     }
@@ -48,6 +49,7 @@
     UILabel *lab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 320)];
     lab.text = [NSString stringWithFormat:@"%d",indexNum];
     lab.font = [UIFont systemFontOfSize:100];
+    lab.backgroundColor = [UIColor clearColor];
     lab.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:lab];
 
