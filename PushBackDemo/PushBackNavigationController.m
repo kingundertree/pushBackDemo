@@ -14,12 +14,12 @@
     UIImageView *backGroundImg;
     UIView *maskCover;
     UIView *backGroundView;
+    int pushNum;
 }
 @end
 
 @implementation PushBackNavigationController
 @synthesize captureType;
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,9 +27,18 @@
     if (self) {
         // Custom initialization
         
-        capImageArr = [[NSMutableArray alloc] initWithCapacity:1000];
+        capImageArr = [[NSMutableArray alloc] initWithCapacity:100];
+        captureType = CaptureTypeWithWindow;
+        pushNum = 0;
     }
     return self;
+}
+- (void)dealloc{
+    capImageArr = nil;
+    [backGroundView removeFromSuperview];
+    backGroundView = nil;
+    [maskCover removeFromSuperview];
+    maskCover = nil;
 }
 - (void)viewDidLoad
 {
@@ -49,17 +58,26 @@
 }
 #pragma mark -pushView
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    [capImageArr addObject:[self capture]];
-    return [super pushViewController:viewController animated:YES];
+    if (pushNum != 0) {
+        [capImageArr addObject:[self capture]];
+        pushNum += 1;
+        return [super pushViewController:viewController animated:YES];
+    }else{
+        pushNum += 1;
+        return [super pushViewController:viewController animated:YES];
+    }
 }
-
 #pragma mark -popView
 -(UIViewController *)popViewControllerAnimated:(BOOL)animated{
     if ([capImageArr count] >= 1) {
         [capImageArr removeLastObject];
     }
-    
     return [super popViewControllerAnimated:animated];
+}
+#pragma mark -popToRootView
+-(NSArray *)popToRootViewControllerAnimated:(BOOL)animated{
+    [capImageArr removeAllObjects];
+    return [super popToRootViewControllerAnimated:animated];
 }
 -(UIImage *)capture{
     if (captureType == CaptureTypeWithView) {
@@ -72,7 +90,7 @@
     }else if (captureType == CaptureTypeWithWindow){
         UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
         UIGraphicsBeginImageContextWithOptions(screenWindow.bounds.size,screenWindow.opaque,0.0);
-
+        
         [screenWindow.layer renderInContext:UIGraphicsGetCurrentContext()];
         UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
@@ -84,13 +102,13 @@
 
 #pragma -mark UIGurstureDelegate
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
-    if (capImageArr.count <= 1) {
+    if (capImageArr.count < 1) {
         return NO;
     }
     return YES;
 }
 -(void)panGesReceive:(UIPanGestureRecognizer *)panGes{
-    if ([capImageArr count] <= 1) return;
+    if ([capImageArr count] < 1) return;
     
     UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
     CGPoint panPoint = [panGes locationInView:screenWindow];
@@ -119,7 +137,6 @@
         [backGroundImg setImage:[capImageArr lastObject]];
         [backGroundView insertSubview:backGroundImg belowSubview:maskCover];
     }else if (panGes.state == UIGestureRecognizerStateEnded){
-        NSLog(@"minus--->>%f",panPoint.x - startX);
         if (panPoint.x - startX > 50) {
             [UIView animateWithDuration:0.3 animations:^{
                 [self moveToX:320];
@@ -168,15 +185,5 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

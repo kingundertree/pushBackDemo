@@ -15,6 +15,6 @@ typedef enum {
 
 @interface PushBackNavigationController : UINavigationController<UIGestureRecognizerDelegate>
 
-//是否支持pushBack动画
 @property (nonatomic, assign) CaptureType captureType;
+
 @end
