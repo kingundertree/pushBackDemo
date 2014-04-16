@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface AJKMainViewController : UIViewController
+#import "XXViewController.h"
+@interface AJKMainViewController : XXViewController
 
 @property(nonatomic,assign) NSInteger indexNum;
 

@@ -13,8 +13,10 @@ typedef enum {
     CaptureTypeWithWindow
 }CaptureType; //截图区域选择
 
-@interface PushBackNavigationController : UINavigationController<UIGestureRecognizerDelegate>
+@interface PushBackNavigationController : UINavigationController<UIGestureRecognizerDelegate,UINavigationControllerDelegate>
 
+@property (nonatomic, assign) BOOL disablePushBack;
+@property (nonatomic, assign) BOOL isPopToRoot;
 @property (nonatomic, assign) CaptureType captureType;
 
 @end

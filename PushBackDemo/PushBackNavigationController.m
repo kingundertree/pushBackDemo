@@ -7,6 +7,10 @@
 //
 
 #import "PushBackNavigationController.h"
+#import "XXViewController.h"
+
+#define screenWidth self.view.bounds.size.width
+#define screenHeight self.view.bounds.size.height
 
 @interface PushBackNavigationController (){
     float startX;
@@ -20,6 +24,8 @@
 
 @implementation PushBackNavigationController
 @synthesize captureType;
+@synthesize disablePushBack;
+@synthesize isPopToRoot;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,13 +49,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    self.delegate = self;
     self.navigationBar.translucent = NO;
     // Do any additional setup after loading the view.
-    self.view.layer.shadowColor = [[UIColor blackColor]CGColor];
-    self.view.layer.shadowOffset = CGSizeMake(5, 5);
-    self.view.layer.shadowRadius = 5;
-    self.view.layer.shadowOpacity = 1;
+    UIImageView *shadowImageView = [[UIImageView alloc] init];
+    shadowImageView.image = [UIImage imageNamed:@"leftside_shadow_bg.png"];
+    shadowImageView.frame = CGRectMake(-10, 0, 10, screenHeight);
+    [self.view addSubview:shadowImageView];
     
     UIPanGestureRecognizer *panGus = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGesReceive:)];
     panGus.delegate = self;
@@ -80,6 +86,11 @@
     [capImageArr removeAllObjects];
     return [super popToRootViewControllerAnimated:animated];
 }
+#pragma -mark UINavigationControllerDelegate
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    self.disablePushBack = NO;
+}
+
 -(UIImage *)capture{
     if (captureType == CaptureTypeWithView) {
         UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, self.view.opaque, 0.0);
@@ -103,18 +114,25 @@
 
 #pragma -mark UIGurstureDelegate
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
-    if (capImageArr.count < 1) {
+    if (capImageArr.count < 1 || self.disablePushBack || [touch.view isKindOfClass:[UIButton class]]) {
         return NO;
     }
     return YES;
 }
 -(void)panGesReceive:(UIPanGestureRecognizer *)panGes{
-    if ([capImageArr count] < 1) return;
+    if (capImageArr.count < 1 || self.disablePushBack) return;
     
     UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
     CGPoint panPoint = [panGes locationInView:screenWindow];
     
     CGRect frame = self.view.frame;
+    
+    XXViewController *xxView = (XXViewController *)self.viewControllers.lastObject;
+    if (xxView.backType == XXBackTypePopToRoot) {
+        self.isPopToRoot = YES;
+    }else{
+        self.isPopToRoot = NO;
+    }
     
     if (panGes.state == UIGestureRecognizerStateBegan) {
         startX = panPoint.x;
@@ -142,7 +160,11 @@
             [UIView animateWithDuration:0.3 animations:^{
                 [self moveToX:320];
             } completion:^(BOOL finished) {
-                [self popViewControllerAnimated:NO];
+                if (self.isPopToRoot) {
+                    [self popToRootViewControllerAnimated:NO];
+                }else{
+                    [self popViewControllerAnimated:NO];
+                }
                 
                 CGRect frame = self.view.frame;
                 frame.origin.x = 0;

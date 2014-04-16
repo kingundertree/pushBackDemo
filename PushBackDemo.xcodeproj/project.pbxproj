@@ -21,6 +21,10 @@
 		271B654518EA6BC1004227B3 /* PushBackDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 271B654418EA6BC1004227B3 /* PushBackDemoTests.m */; };
 		271B655418EA7838004227B3 /* AJKMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 271B655318EA7838004227B3 /* AJKMainViewController.m */; };
 		271B655718EA79C9004227B3 /* PushBackNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 271B655618EA79C9004227B3 /* PushBackNavigationController.m */; };
+		F807AE9318FE93A5000A62EA /* XXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F807AE9218FE93A5000A62EA /* XXViewController.m */; };
+		F807AE9918FE9416000A62EA /* pushBackLock.m in Sources */ = {isa = PBXBuildFile; fileRef = F807AE9818FE9416000A62EA /* pushBackLock.m */; };
+		F807AE9C18FE9677000A62EA /* leftside_shadow_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = F807AE9A18FE9677000A62EA /* leftside_shadow_bg.png */; };
+		F807AE9D18FE9677000A62EA /* leftside_shadow_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F807AE9B18FE9677000A62EA /* leftside_shadow_bg@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +58,12 @@
 		271B655318EA7838004227B3 /* AJKMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AJKMainViewController.m; sourceTree = "<group>"; };
 		271B655518EA79C9004227B3 /* PushBackNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushBackNavigationController.h; sourceTree = "<group>"; };
 		271B655618EA79C9004227B3 /* PushBackNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushBackNavigationController.m; sourceTree = "<group>"; };
+		F807AE9118FE93A5000A62EA /* XXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XXViewController.h; sourceTree = "<group>"; };
+		F807AE9218FE93A5000A62EA /* XXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XXViewController.m; sourceTree = "<group>"; };
+		F807AE9718FE9416000A62EA /* pushBackLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pushBackLock.h; sourceTree = "<group>"; };
+		F807AE9818FE9416000A62EA /* pushBackLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = pushBackLock.m; sourceTree = "<group>"; };
+		F807AE9A18FE9677000A62EA /* leftside_shadow_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = leftside_shadow_bg.png; sourceTree = "<group>"; };
+		F807AE9B18FE9677000A62EA /* leftside_shadow_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "leftside_shadow_bg@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +128,8 @@
 				271B652F18EA6BC1004227B3 /* AJKAppDelegate.m */,
 				271B655218EA7838004227B3 /* AJKMainViewController.h */,
 				271B655318EA7838004227B3 /* AJKMainViewController.m */,
+				F807AE9118FE93A5000A62EA /* XXViewController.h */,
+				F807AE9218FE93A5000A62EA /* XXViewController.m */,
 				271B653118EA6BC1004227B3 /* Images.xcassets */,
 				271B652618EA6BC1004227B3 /* Supporting Files */,
 			);
@@ -156,8 +168,12 @@
 		271B654E18EA6BC7004227B3 /* pushBack */ = {
 			isa = PBXGroup;
 			children = (
+				F807AE9A18FE9677000A62EA /* leftside_shadow_bg.png */,
+				F807AE9B18FE9677000A62EA /* leftside_shadow_bg@2x.png */,
 				271B655518EA79C9004227B3 /* PushBackNavigationController.h */,
 				271B655618EA79C9004227B3 /* PushBackNavigationController.m */,
+				F807AE9718FE9416000A62EA /* pushBackLock.h */,
+				F807AE9818FE9416000A62EA /* pushBackLock.m */,
 			);
 			name = pushBack;
 			sourceTree = "<group>";
@@ -239,7 +255,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				271B652A18EA6BC1004227B3 /* InfoPlist.strings in Resources */,
+				F807AE9C18FE9677000A62EA /* leftside_shadow_bg.png in Resources */,
 				271B653218EA6BC1004227B3 /* Images.xcassets in Resources */,
+				F807AE9D18FE9677000A62EA /* leftside_shadow_bg@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,8 +278,10 @@
 			files = (
 				271B655418EA7838004227B3 /* AJKMainViewController.m in Sources */,
 				271B652C18EA6BC1004227B3 /* main.m in Sources */,
+				F807AE9318FE93A5000A62EA /* XXViewController.m in Sources */,
 				271B655718EA79C9004227B3 /* PushBackNavigationController.m in Sources */,
 				271B653018EA6BC1004227B3 /* AJKAppDelegate.m in Sources */,
+				F807AE9918FE9416000A62EA /* pushBackLock.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -460,6 +480,7 @@
 				271B654A18EA6BC1004227B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		271B654B18EA6BC1004227B3 /* Build configuration list for PBXNativeTarget "PushBackDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -468,6 +489,7 @@
 				271B654D18EA6BC1004227B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
