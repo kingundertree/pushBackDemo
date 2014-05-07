@@ -11,6 +11,7 @@
 
 #define screenWidth self.view.bounds.size.width
 #define screenHeight self.view.bounds.size.height
+#define moveProportion 0.7
 
 @interface PushBackNavigationController (){
     float startX;
@@ -19,6 +20,7 @@
     UIView *maskCover;
     UIView *backGroundView;
     int pushNum;
+    BOOL isMoving;
 }
 @end
 
@@ -26,6 +28,7 @@
 @synthesize captureType;
 @synthesize disablePushBack;
 @synthesize isPopToRoot;
+@synthesize pushBackType;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -35,7 +38,9 @@
         
         capImageArr = [[NSMutableArray alloc] initWithCapacity:100];
         captureType = CaptureTypeWithWindow;
+        pushBackType = PushBackWithSlowMove;
         pushNum = 0;
+        isMoving = NO;
     }
     return self;
 }
@@ -65,6 +70,7 @@
 }
 #pragma mark -pushView
 -(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    isMoving = YES;
     if (pushNum != 0) {
         [capImageArr addObject:[self capture]];
         pushNum += 1;
@@ -76,6 +82,7 @@
 }
 #pragma mark -popView
 -(UIViewController *)popViewControllerAnimated:(BOOL)animated{
+    isMoving = YES;
     if ([capImageArr count] >= 1) {
         [capImageArr removeLastObject];
     }
@@ -90,7 +97,9 @@
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
     self.disablePushBack = NO;
 }
-
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    isMoving = NO;
+}
 -(UIImage *)capture{
     if (captureType == CaptureTypeWithView) {
         UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, self.view.opaque, 0.0);
@@ -114,13 +123,13 @@
 
 #pragma -mark UIGurstureDelegate
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
-    if (capImageArr.count < 1 || self.disablePushBack || [touch.view isKindOfClass:[UIButton class]]) {
+    if (capImageArr.count < 1 || self.disablePushBack || [touch.view isKindOfClass:[UIButton class]] || isMoving) {
         return NO;
     }
     return YES;
 }
 -(void)panGesReceive:(UIPanGestureRecognizer *)panGes{
-    if (capImageArr.count < 1 || self.disablePushBack) return;
+    if (capImageArr.count < 1 || self.disablePushBack || isMoving) return;
     
     UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
     CGPoint panPoint = [panGes locationInView:screenWindow];
@@ -189,17 +198,22 @@
 }
 
 - (void)moveToX:(float)x{
-    x = x > 320 ? 320 : x;
+    x = x >= screenWidth ? screenWidth : x;
     x = x < 0 ? 0 : x;
     CGRect frame = self.view.frame;
+    float alpha = 0.5 - x/800;
+    
     frame.origin.x = x;
     self.view.frame = frame;
-    
-    float scale = (x/6400) + 0.95;
-    float alpha = 0.5 - x/500;
-    
-    backGroundImg.transform = CGAffineTransformMakeScale(scale, scale);
     maskCover.alpha = alpha;
+    
+    if (pushBackType == PushBackWithSlowMove) {
+        frame.origin.x = x*(1 - moveProportion) - screenWidth*(1 - moveProportion);
+        backGroundView.frame = frame;
+    }else{
+        float scale = x/(screenWidth*20) + 0.95;
+        backGroundView.transform = CGAffineTransformMakeScale(scale, scale);
+    }
 }
 
 - (void)didReceiveMemoryWarning

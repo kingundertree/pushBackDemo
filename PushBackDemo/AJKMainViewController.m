@@ -41,7 +41,7 @@
     self.backType = XXBackTypePopBack;
     
     // Do any additional setup after loading the view.
-    self.title = [NSString stringWithFormat:@"%d",indexNum];
+    self.title = [NSString stringWithFormat:@"英雄%d",indexNum];
     self.view.backgroundColor = [UIColor colorWithRed:(arc4random() % 255 + 1)/255.0 green:(arc4random() % 255 + 1)/255.0 blue:(arc4random() % 255 + 1)/255.0 alpha:1.0];
     self.navigationController.navigationBar.translucent = YES;
     
@@ -57,7 +57,7 @@
     [self.view addSubview:lab];
 
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn.frame = CGRectMake(0, 320, 320, 40);
+    btn.frame = CGRectMake(0, 320, 320, 80);
     [btn setTitle:@"Next Page" forState:UIControlStateNormal];
     btn.backgroundColor = [UIColor lightGrayColor];
     [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
