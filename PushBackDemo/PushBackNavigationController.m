@@ -20,13 +20,12 @@
     UIView *maskCover;
     UIView *backGroundView;
     int pushNum;
-    BOOL isMoving;
 }
 @end
 
 @implementation PushBackNavigationController
 @synthesize captureType;
-@synthesize disablePushBack;
+@synthesize disableGestureForBack;
 @synthesize isPopToRoot;
 @synthesize pushBackType;
 
@@ -36,14 +35,16 @@
     if (self) {
         // Custom initialization
         
+        self.delegate = self;
         capImageArr = [[NSMutableArray alloc] initWithCapacity:100];
-        captureType = CaptureTypeWithWindow;
-        pushBackType = PushBackWithSlowMove;
+        self.captureType = CaptureTypeWithWindow;
+        self.pushBackType = PushBackWithScale;
         pushNum = 0;
-        isMoving = NO;
+        self.isMoving = NO;
     }
     return self;
 }
+
 - (void)dealloc{
     capImageArr = nil;
     [backGroundView removeFromSuperview];
@@ -51,14 +52,15 @@
     [maskCover removeFromSuperview];
     maskCover = nil;
 }
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.delegate = self;
+    
     self.navigationBar.translucent = NO;
     // Do any additional setup after loading the view.
     UIImageView *shadowImageView = [[UIImageView alloc] init];
-    shadowImageView.image = [UIImage imageNamed:@"leftside_shadow_bg.png"];
+    shadowImageView.image = [UIImage imageNamed:@"leftside_shadow_bg"];
     shadowImageView.frame = CGRectMake(-10, 0, 10, screenHeight);
     [self.view addSubview:shadowImageView];
     
@@ -68,54 +70,71 @@
     panGus.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:panGus];
 }
+
 #pragma mark -pushView
--(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    if (isMoving) {
+-(void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if (self.isMoving) {
         return;
     }
-    isMoving = YES;
+    self.isMoving = YES;
+    
     if (pushNum != 0) {
         [capImageArr addObject:[self capture]];
         pushNum += 1;
-        return [super pushViewController:viewController animated:YES];
-    }else{
+        return [super pushViewController:viewController animated:animated];
+    } else {
         pushNum += 1;
-        return [super pushViewController:viewController animated:YES];
+        return [super pushViewController:viewController animated:animated];
     }
 }
+
 #pragma mark -popView
--(UIViewController *)popViewControllerAnimated:(BOOL)animated{
-    if (isMoving) {
+-(UIViewController *)popViewControllerAnimated:(BOOL)animated
+{
+    if (self.isMoving) {
         return nil;
     }
-    isMoving = YES;
+    self.isMoving = YES;
     if ([capImageArr count] >= 1) {
         [capImageArr removeLastObject];
     }
     return [super popViewControllerAnimated:animated];
 }
+
+- (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    NSArray *viewcontrollers = self.viewControllers;
+    NSInteger indexNum = [viewcontrollers indexOfObject:viewController];
+    NSInteger pushNums = viewcontrollers.count - indexNum - 1;
+    
+    if (pushNums > 0) {
+        for (int i = 0; i < pushNums; i++) {
+            [capImageArr removeLastObject];
+        }
+    }
+    
+    return [super popToViewController:viewController animated:animated];
+}
+
 #pragma mark -popToRootView
--(NSArray *)popToRootViewControllerAnimated:(BOOL)animated{
+-(NSArray *)popToRootViewControllerAnimated:(BOOL)animated
+{
     [capImageArr removeAllObjects];
     return [super popToRootViewControllerAnimated:animated];
 }
-#pragma -mark UINavigationControllerDelegate
-- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    self.disablePushBack = NO;
-}
-- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-    isMoving = NO;
-}
--(UIImage *)capture{
-    if (captureType == CaptureTypeWithView) {
+
+-(UIImage *)capture
+{
+    if (self.captureType == CaptureTypeWithView) {
         UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, self.view.opaque, 0.0);
         [self.view.layer renderInContext:UIGraphicsGetCurrentContext()];
         UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         
         return img;
-    }else if (captureType == CaptureTypeWithWindow){
-        UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
+    } else if (self.captureType == CaptureTypeWithWindow){
+        UIWindow *screenWindow = [UIApplication sharedApplication].windows[0];
         UIGraphicsBeginImageContextWithOptions(screenWindow.bounds.size,screenWindow.opaque,0.0);
         
         [screenWindow.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -127,32 +146,52 @@
     return nil;
 }
 
+#pragma -mark UINavigationControllerDelegate
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    self.disableGestureForBack = NO;
+}
+
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    self.isMoving = NO;
+}
+
 #pragma -mark UIGurstureDelegate
--(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+        return NO;
+    }
     if (capImageArr.count < 1 ||
-        self.disablePushBack ||
+        self.disableGestureForBack ||
         [touch.view isKindOfClass:[UIButton class]] ||
-        [NSStringFromClass([touch.view class]) isEqualToString:@"UITableViewCellContentView"] ||
-        isMoving)
+        self.isMoving )
     {
         return NO;
     }
     return YES;
 }
--(void)panGesReceive:(UIPanGestureRecognizer *)panGes{
-    if (capImageArr.count < 1 || self.disablePushBack || isMoving) return;
+
+-(void)panGesReceive:(UIPanGestureRecognizer *)panGes
+{
+    if (capImageArr.count < 1 || self.disableGestureForBack || self.disableGestureForBack || self.isMoving) return;
+    
+    if (![self.viewControllers.lastObject isKindOfClass:[XXViewController class]]) {
+        return;
+    }
+    
+    XXViewController *gesViewController = (XXViewController *)self.viewControllers.lastObject;
+    if (gesViewController.backType == XXBackTypePopToRoot) {
+        self.isPopToRoot = YES;
+    } else {
+        self.isPopToRoot = NO;
+    }
     
     UIWindow *screenWindow = [UIApplication sharedApplication].keyWindow;
     CGPoint panPoint = [panGes locationInView:screenWindow];
     
     CGRect frame = self.view.frame;
-    
-    XXViewController *xxView = (XXViewController *)self.viewControllers.lastObject;
-    if (xxView.backType == XXBackTypePopToRoot) {
-        self.isPopToRoot = YES;
-    }else{
-        self.isPopToRoot = NO;
-    }
     
     if (panGes.state == UIGestureRecognizerStateBegan) {
         startX = panPoint.x;
@@ -162,7 +201,7 @@
         }
         backGroundView = [[UIView alloc] initWithFrame:frame];
         [self.view.superview insertSubview:backGroundView belowSubview:self.view];
-
+        
         if (!maskCover) {
             maskCover = [[UIView alloc] initWithFrame:frame];
             maskCover.backgroundColor = [UIColor blackColor];
@@ -173,31 +212,42 @@
             backGroundImg = nil;
         }
         backGroundImg = [[UIImageView alloc] initWithFrame:frame];
-        [backGroundImg setImage:[capImageArr lastObject]];
+        
+        if (self.isPopToRoot) {
+            [backGroundImg setImage:[capImageArr firstObject]];
+        } else {
+            [backGroundImg setImage:[capImageArr lastObject]];
+        }
         [backGroundView insertSubview:backGroundImg belowSubview:maskCover];
-    }else if (panGes.state == UIGestureRecognizerStateEnded){
+    } else if (panGes.state == UIGestureRecognizerStateEnded){
         if (panPoint.x - startX > 50) {
             [UIView animateWithDuration:0.3 animations:^{
-                [self moveToX:320];
+                [self moveToX:screenWidth];
             } completion:^(BOOL finished) {
-                if (self.isPopToRoot) {
-                    [self popToRootViewControllerAnimated:NO];
-                }else{
-                    [self popViewControllerAnimated:NO];
+                if (backGroundView) {
+                    [backGroundView removeFromSuperview];
+                    backGroundView = nil;
                 }
                 
+                if (self.isPopToRoot) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"PopActionIsOver" object:nil userInfo:nil];
+                    [self popToRootViewControllerAnimated:NO];
+                } else {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"PopActionIsOver" object:nil userInfo:nil];
+                    [self popViewControllerAnimated:NO];
+                }
                 CGRect frame = self.view.frame;
                 frame.origin.x = 0;
                 self.view.frame = frame;
             }];
-        }else{
+        } else {
             [UIView animateWithDuration:0.3 animations:^{
                 [self moveToX:0];
             } completion:^(BOOL finished) {
             }];
         }
         return;
-    }else if (panGes.state == UIGestureRecognizerStateCancelled){
+    } else if (panGes.state == UIGestureRecognizerStateCancelled){
         [UIView animateWithDuration:0.3 animations:^{
             [self moveToX:0];
         } completion:^(BOOL finished) {
@@ -221,7 +271,7 @@
     if (pushBackType == PushBackWithSlowMove) {
         frame.origin.x = x*(1 - moveProportion) - screenWidth*(1 - moveProportion);
         backGroundView.frame = frame;
-    }else{
+    } else {
         float scale = x/(screenWidth*20) + 0.95;
         backGroundView.transform = CGAffineTransformMakeScale(scale, scale);
     }

@@ -12,7 +12,9 @@
 
 @implementation pushBackLock
 + (void)setDisableGestureForBack:(UINavigationController *)nav disable:(BOOL)disable{
-    PushBackNavigationController *passNav = (PushBackNavigationController*)nav;
-    passNav.disablePushBack = YES;
+    if ([nav isKindOfClass:[PushBackNavigationController class]]) {
+        PushBackNavigationController *passNav = (PushBackNavigationController*)nav;
+        passNav.disableGestureForBack = YES;
     }
+}
 @end

@@ -20,7 +20,7 @@
     
     AJKMainViewController *MVC = [[AJKMainViewController alloc] init];
     MVC.indexNum = 0;
-//    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:MVC];
+    
     PushBackNavigationController *nav = [[PushBackNavigationController alloc] initWithRootViewController:MVC];
     self.window.rootViewController = nav;
     
