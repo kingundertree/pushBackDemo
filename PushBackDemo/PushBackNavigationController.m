@@ -21,6 +21,8 @@
     UIView *backGroundView;
     int pushNum;
 }
+@property (nonatomic, assign) BOOL isMoving;
+@property (nonatomic, assign) BOOL isPopToRoot;
 @end
 
 @implementation PushBackNavigationController

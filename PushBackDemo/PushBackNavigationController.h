@@ -28,10 +28,8 @@ typedef enum {
 @interface PushBackNavigationController : UINavigationController <UIGestureRecognizerDelegate,UINavigationControllerDelegate>
 
 @property (nonatomic, assign) BOOL disableGestureForBack;
-@property (nonatomic, assign) BOOL isPopToRoot;
 @property (nonatomic, assign) CaptureType captureType;
 @property (nonatomic, assign) PushBckType pushBackType;
-@property (nonatomic, assign) BOOL isMoving;
 
 
 @end
